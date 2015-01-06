@@ -36,7 +36,7 @@ public class AdminController {
 
     @Autowired
     CredentialRepository credentialRepository;
-    
+
     @Autowired
     ServiceInstanceRepository serviceInstanceRepository;
 
@@ -66,9 +66,9 @@ public class AdminController {
     	//Delete the service
     	serviceRepository.delete(serviceRepository.findOneByName(serviceName));
     }
-    
+
     @RequestMapping(value = "/admin/service/{serviceName}", method = RequestMethod.PUT)
-    public ResponseEntity<Service> storeService(@PathVariable("serviceName") String serviceName, 
+    public ResponseEntity<Service> storeService(@PathVariable("serviceName") String serviceName,
     											@RequestBody Service service) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX storeService XXXXXXXXXXXXXXXXXXXXXX");
 
@@ -77,7 +77,7 @@ public class AdminController {
 		} else if(!service.getName().equals(serviceName)) {
 			return new ResponseEntity<Service>(HttpStatus.CONFLICT);
 		}
-    	
+
     	if(service.getId() == null) {
         	Service prevVersion = serviceRepository.findOneByName(serviceName);
         	if(prevVersion == null) {
@@ -89,42 +89,38 @@ public class AdminController {
 
     	return new ResponseEntity<Service>(serviceRepository.save(service), HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = "/admin/service/{serviceName}/plan", method = RequestMethod.GET)
     public List<Plan> listPlansForService(@PathVariable("serviceName") String serviceName) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX listPlansForService XXXXXXXXXXXXXXXXXXXXXX");
     	List<Plan> plans = planRepository.findByServiceName(serviceName, new Sort("name"));
     	for(Plan plan:plans) {
-    		List<Credential> credentialList = credentialRepository.findByPlanNameAndServiceName(plan.getName(), serviceName, new Sort("key"));
-    		plan.setCredentialList(credentialList);
-    		plan.setCredentials(credentialList);
+    		plan.setCredentials(credentialRepository.findByPlanNameAndServiceName(plan.getName(), serviceName, new Sort("key")));
     	}
-    	
+
     	return plans;
     }
-  
+
     @RequestMapping(value = "/admin/service/{serviceName}/plan/{planName}", method = RequestMethod.GET)
-    public Plan getPlan(@PathVariable("serviceName") String serviceName, 
+    public Plan getPlan(@PathVariable("serviceName") String serviceName,
     						@PathVariable("planName") String planName) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX getPlan XXXXXXXXXXXXXXXXXXXXXX");
     	Plan result = planRepository.findOneByNameAndServiceName(planName, serviceName);
     	if(result != null) {
-    		List<Credential> credentialList = credentialRepository.findByPlanNameAndServiceName(result.getName(), serviceName, new Sort("key"));
-    		result.setCredentialList(credentialList);
-    		result.setCredentials(credentialList);
+    		result.setCredentials(credentialRepository.findByPlanNameAndServiceName(result.getName(), serviceName, new Sort("key")));
     	}
     	return result;
     }
-    
+
     @RequestMapping(value = "/admin/service/{serviceName}/plan/{planName}/credential", method = RequestMethod.GET)
-    public Iterable<Credential> listCredentials(@PathVariable("serviceName") String serviceName, 
+    public Iterable<Credential> listCredentials(@PathVariable("serviceName") String serviceName,
     												@PathVariable("planName") String planName) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX listCredentials XXXXXXXXXXXXXXXXXXXXXX");
     	return credentialRepository.findByPlanNameAndServiceName(planName, serviceName, new Sort("key"));
     }
 
     @RequestMapping(value = "/admin/service/{serviceName}/plan/{planName}/serviceinstance", method = RequestMethod.GET)
-    public Iterable<ServiceInstance> listServiceInstances(@PathVariable("serviceName") String serviceName, 
+    public Iterable<ServiceInstance> listServiceInstances(@PathVariable("serviceName") String serviceName,
     												        @PathVariable("planName") String planName) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX listServiceInstances XXXXXXXXXXXXXXXXXXXXXX");
     	Service service = serviceRepository.findOneByName(serviceName);
@@ -137,7 +133,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/admin/service/{serviceName}/plan/{planName}/servicebinding", method = RequestMethod.GET)
-    public Iterable<ServiceBinding> listServiceBindings(@PathVariable("serviceName") String serviceName, 
+    public Iterable<ServiceBinding> listServiceBindings(@PathVariable("serviceName") String serviceName,
     												        @PathVariable("planName") String planName) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX listServiceBindings XXXXXXXXXXXXXXXXXXXXXX");
     	Service service = serviceRepository.findOneByName(serviceName);
@@ -150,7 +146,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/admin/service/{serviceName}/plan/{planName}", method = RequestMethod.DELETE)
-    public void deletePlan(@PathVariable("serviceName") String serviceName, 
+    public void deletePlan(@PathVariable("serviceName") String serviceName,
 							@PathVariable("planName") String planName) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX deletePlan XXXXXXXXXXXXXXXXXXXXXX");
 
@@ -161,7 +157,7 @@ public class AdminController {
     }
 
     @RequestMapping(value = "/admin/service/{serviceName}/plan/{planName}", method = RequestMethod.PUT)
-    public ResponseEntity<Plan> storePlan(@PathVariable("serviceName") String serviceName, 
+    public ResponseEntity<Plan> storePlan(@PathVariable("serviceName") String serviceName,
     						@PathVariable("planName") String planName,
     						@RequestBody Plan plan) {
     	System.out.println("XXXXXXXXXXXXXXXXXXXXXX storePlan XXXXXXXXXXXXXXXXXXXXXX");
@@ -169,22 +165,22 @@ public class AdminController {
     		//Service doesn't exist
 			return new ResponseEntity<Plan>(HttpStatus.CONFLICT);
     	}
-    	
+
     	if(plan.getName() == null) {
     		plan.setName(planName);
 		} else if(!plan.getName().equals(planName)) {
 			//Mismatch between JSON input and URL
 			return new ResponseEntity<Plan>(HttpStatus.CONFLICT);
 		}
-    	
+
     	if(plan.getServiceName() == null) {
     		plan.setServiceName(serviceName);
 		} else if(!plan.getServiceName().equals(serviceName)) {
 			//Mismatch between JSON input and URL
 			return new ResponseEntity<Plan>(HttpStatus.CONFLICT);
 		}
-    	
-    	List<Credential> newCredentials = plan.getCredentialList();
+
+    	List<Credential> newCredentials = plan.getCredentials();
     	for(Credential newCredential:newCredentials) {
     		if(newCredential.getServiceName() == null) {
     			newCredential.setServiceName(serviceName);
@@ -207,7 +203,7 @@ public class AdminController {
     	} else {
     		plan.setId(existingPlan.getId());
     	}
-    	
+
     	//Store plan
     	planRepository.save(plan);
     	//Make sure the credentials are stored as well!
@@ -215,7 +211,7 @@ public class AdminController {
     	credentialRepository.delete(credentialRepository.findByPlanNameAndServiceName(planName, serviceName));
     	//Then store the new ones
     	credentialRepository.save(newCredentials);
-    	
+
     	return new ResponseEntity<Plan>(getPlan(serviceName, planName), HttpStatus.OK);
     }
 }

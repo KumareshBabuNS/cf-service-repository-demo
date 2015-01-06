@@ -20,7 +20,7 @@ public class Plan {
     @Column(nullable = false)
     @JsonSerialize
     private String serviceName;
-    
+
     @Column(nullable = false)
     @JsonSerialize
     private String name;
@@ -28,15 +28,11 @@ public class Plan {
     @Column(nullable = false)
     @JsonSerialize
     private String description;
-    
+
     @Transient
     @JsonSerialize
-    private Map<Object, Object> credentials;
-    
-    @Transient
-    @JsonSerialize
-    private List<Credential> credentialList;
-    
+    private List<Credential> credentials;
+
     public String getId() {
         return id;
     }
@@ -69,29 +65,14 @@ public class Plan {
         this.description = description;
     }
 
-	public List<Credential> getCredentialList() {
-		return credentialList;
-	}
-
-	public void setCredentialList(List<Credential> credentialList) {
-		this.credentialList = credentialList;
-	}
-	
-	public Map<Object, Object> getCredentials() {
+    public List<Credential> getCredentials() {
 		return credentials;
 	}
 
-	public void setCredentials(Map<Object, Object> credentials) {
+	public void setCredentials(List<Credential> credentials) {
 		this.credentials = credentials;
 	}
 
-	public void setCredentials(List<Credential> credentialList) {
-		credentials = new HashMap<>();
-		for(Credential c:credentialList) {
-			credentials.put(c.getKey(), c.getValue());
-		}
-	}
-	
 	public String toString() {
     	return "Plan(id: "+id+ " serviceId: " + serviceName + " name: " + name + " description: " + description + ")";
     }
