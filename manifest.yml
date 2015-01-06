@@ -1,7 +1,7 @@
 ---
 applications:
-- name: service-broker
+- name: service-repository
   memory: 512M
   instances: 1
-  host: service-broker-${random-word}
+  host: service-repository-${random-word}
   path: build/libs/cf-service-repository-0.0.1-SNAPSHOT.jar
