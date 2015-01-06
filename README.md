@@ -63,3 +63,59 @@ broker: service-repository
    service             plan        access   orgs
    ServiceRepository   DummyPlan   all
 ```
+* Run ```cf marketplace``` to verify that the service and plan shows up on the marketplace.
+```
+cf marketplace
+Getting services from marketplace in org me / space development as admin...
+OK
+
+service             plans       description
+ServiceRepository   DummyPlan   Service Repository
+```
+##How to configure a demo application to leverage the service repository
+The following examples leverages a Hello World demo application where there is a client application talking to one out of two possible back-ends to do a Hello World!
+###Deploy the Hello World application
+Follow the instructions for the [cf-hello-world-demo](https://github.com/bboe-pivotal/cf-hello-world-demo/blob/master/README.md) to deploy the demo application.
+
+Use the ```cf apps``` command to verify the right components have been deployed.
+```
+cf apps
+Getting apps in org me / space development as admin...
+OK
+
+name                 requested state   instances   memory   disk   urls
+hello-client         started           1/1         512M     1G     hello-client-trancelike-bootjack.10.244.0.34.xip.io
+service-repository   started           1/1         512M     1G     service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+hello-svc-english    started           1/1         512M     1G     hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io
+hello-svc-italian    started           1/1         512M     1G     hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io
+```
+The following apps should now be running:
+* hello-client - Hello World client application
+* hello-svc-english - Hello World service, exposing a REST service doing Hello World in English, which is called by hello-client
+* hello-svc-italian - Hello World service, exposing a REST service doing Hello World in Italian, which is called by hello-client
+* service-repository - The service repository installed earlier in this document
+##Register hello world services in service repository
+These instructions leverages a set of scripts in the admintool directory. The endpoint information is configured in setenv.sh. The file may look as follows:
+```
+export SERVER_URL=http://admin:admin@service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+```
+* Run ```listservices.sh``` to list the services in the repository.
+```
+./listservices.sh
+Name               Description         Is Bindable
+ServiceRepository  Service Repository  True
+```
+* Run ```listplans.sh``` to list the plans that belong to the configured service.
+```
+./listplans.sh ServiceRepository
+Name       Description
+DummyPlan  Dummy Plan
+```
+* Add the English hello world service to the repository by using ```storeplan.sh```
+```
+./storeplan.sh ServiceRepository Hello-World-English "Hello World in English" uri
+Service Name: ServiceRepository
+Plan Name: Hello-World-English
+Description: Hello World in English
+Value for uri:
+```
