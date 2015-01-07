@@ -3,7 +3,7 @@ Small demo that demonstrates how to build and deploy your own service broker on 
 
 ##Deployment Instructions
 ###Download Source Code from Repository
-```bash
+```
 git clone https://github.com/bboe-pivotal/cf-service-repository-demo/
 ```
 ###Compile and Deploy Server Components
@@ -118,4 +118,117 @@ Service Name: ServiceRepository
 Plan Name: Hello-World-English
 Description: Hello World in English
 Value for uri:
+http://hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io
+
+New version:
+Service Name: ServiceRepository
+Plan Name:    Hello-World-English
+Description:  Hello World in English
+Credentials:  [{u'planName': u'Hello-World-English', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io', u'key': u'uri'}]
+
+Credentials:
+Key  Value
+uri  http://hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io
 ```
+* Add the Italian hello world service to the repository by using ```storeplan.sh```
+```
+./storeplan.sh ServiceRepository Hello-World-Italian "Hello World in Italian" uri
+Service Name: ServiceRepository
+Plan Name: Hello-World-Italian
+Description: Hello World in Italian
+Value for uri:
+http://hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io
+
+New version:
+Service Name: ServiceRepository
+Plan Name:    Hello-World-Italian
+Description:  Hello World in Italian
+Credentials:  [{u'planName': u'Hello-World-Italian', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io', u'key': u'uri'}]
+
+Credentials:
+Key  Value
+uri  http://hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io
+```
+* Delete the dummy plan by using ```deleteplan.sh```
+```
+./deleteplan.sh ServiceRepository DummyPlan
+```
+* Run ```listplans.sh``` to see the changes made to the repository
+```
+./listplans.sh ServiceRepository
+Name                 Description
+Hello-World-English  Hello World in English
+Hello-World-Italian  Hello World in Italian
+```
+* Note that changing the underlying repository will not refresh the marketplace in Cloud Foundry. Run ```cf update-service-broker``` to trigger an update
+```
+cf update-service-broker service-repository admin admin http://service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+Updating service broker service-repository as admin...
+OK
+Warning: Service plans are missing from the broker's catalog (http://service-repository-stalkless-overbrutality.10.244.0.34.xip.io/v2/catalog) but can not be removed from Cloud Foundry while instances exist. The plans have been deactivated to prevent users from attempting to provision new instances of these plans. The broker should continue to support bind, unbind, and delete for existing instances; if these operations fail contact your broker provider.
+ServiceRepository
+  DummyPlan
+```
+The error can be ignored as the DummyPlan has not been used for anything in this case.
+* Enable access to the newly registered plan to everybody
+```
+cf enable-service-access ServiceRepository
+```
+* Run ```cf marketplace``` to verify that the service and plan shows up on the marketplace.
+```
+cf marketplace
+Getting services from marketplace in org me / space development as admin...
+OK
+
+service             plans                                      description
+ServiceRepository   Hello-World-English, Hello-World-Italian   Service Repository
+```
+###Reconfigure the Hello World client to leverage the service repository instead of the user provided service
+* Create a service instance for the English hello world service
+```
+cf create-service ServiceRepository Hello-World-English hello-service-english
+```
+* Create a service instance for the Italian hello world service
+```
+cf create-service ServiceRepository Hello-World-Italian hello-service-italian
+```
+* Running ```cf services``` will display the two service instances just created, as well as some user provided services created earlier.
+```
+cf services
+Getting services in org me / space development as admin...
+OK
+
+name                    service             plan                  bound apps
+hello-english           user-provided                             hello-client
+hello-italian           user-provided
+hello-service-english   ServiceRepository   Hello-World-English
+hello-service-italian   ServiceRepository   Hello-World-Italian
+```
+* Unbind hello-client from user provided service
+```
+cf unbind-service hello-client hello-english
+```
+* Bind hello-client to service provided by service repository
+```
+cf bind-service hello-client hello-service-italian
+```
+* Restage client application to make sure it uses the new service
+```
+cf restage hello-client
+```
+* Delete old user provided services
+```
+cf delete-service hello-english -f
+cf delete-service hello-italian -f
+```
+* Run ```cf services``` to verfiy the old user provided services are gone and that the client is leveraging the new service provided by the service registry.
+```
+cf services
+Getting services in org me / space development as admin...
+OK
+
+name                    service             plan                  bound apps
+hello-service-english   ServiceRepository   Hello-World-English
+hello-service-italian   ServiceRepository   Hello-World-Italian   hello-client
+```
+* Run the client to verify the Hello World client is working
