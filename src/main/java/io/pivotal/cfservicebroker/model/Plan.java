@@ -1,8 +1,6 @@
 package io.pivotal.cfservicebroker.model;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.*;
 
@@ -20,7 +18,7 @@ public class Plan {
     @Column(nullable = false)
     @JsonSerialize
     private String serviceName;
-
+    
     @Column(nullable = false)
     @JsonSerialize
     private String name;
@@ -28,11 +26,11 @@ public class Plan {
     @Column(nullable = false)
     @JsonSerialize
     private String description;
-
+    
     @Transient
     @JsonSerialize
     private List<Credential> credentials;
-
+    
     public String getId() {
         return id;
     }
@@ -64,7 +62,7 @@ public class Plan {
     public void setDescription(String description) {
         this.description = description;
     }
-
+    
     public List<Credential> getCredentials() {
 		return credentials;
 	}
