@@ -26,12 +26,12 @@ Getting apps in org me / space development as admin...
 OK
 
 name                 requested state   instances   memory   disk   urls
-service-repository   started           1/1         512M     1G     service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+service-repository   started           1/1         512M     1G     service-repository...
 ```
 ###Register and enable the service repository as a service broker within Cloud Foundry
 * Create service broker
 ```
-cf create-service-broker service-repository admin admin http://service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+cf create-service-broker service-repository admin admin http://service-repository...
 ```
 Note that the admin/admin username/password is defined in the file src/main/resources/application.properties. Also remember to to update the URL according to your environment.
 * Verify the service broker has been deployed by executing ```cf service-brokers```
@@ -40,7 +40,7 @@ cf service-brokers
 Getting service brokers as admin...
 
 name                 url
-service-repository   http://service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+service-repository   http://service-repository...
 ```
 * List the service repository with the command ```cf service-access``` to see the plans available by default.
 ```
@@ -84,10 +84,10 @@ Getting apps in org me / space development as admin...
 OK
 
 name                 requested state   instances   memory   disk   urls
-hello-client         started           1/1         512M     1G     hello-client-trancelike-bootjack.10.244.0.34.xip.io
-service-repository   started           1/1         512M     1G     service-repository-stalkless-overbrutality.10.244.0.34.xip.io
-hello-svc-english    started           1/1         512M     1G     hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io
-hello-svc-italian    started           1/1         512M     1G     hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io
+hello-client         started           1/1         512M     1G     hello-client...
+service-repository   started           1/1         512M     1G     service-repository...
+hello-svc-english    started           1/1         512M     1G     hello-svc-eng...
+hello-svc-italian    started           1/1         512M     1G     hello-svc-ita...
 ```
 The following apps should now be running:
 * hello-client - Hello World client application
@@ -97,7 +97,7 @@ The following apps should now be running:
 ##Register hello world services in service repository
 These instructions leverages a set of scripts in the admintool directory. The endpoint information is configured in setenv.sh. The file may look as follows:
 ```
-export SERVER_URL=http://admin:admin@service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+export SERVER_URL=http://admin:admin@service-repository...
 ```
 * Run ```listservices.sh``` to list the services in the repository.
 ```
@@ -118,17 +118,17 @@ Service Name: ServiceRepository
 Plan Name: Hello-World-English
 Description: Hello World in English
 Value for uri:
-http://hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io
+http://hello-svc-eng...
 
 New version:
 Service Name: ServiceRepository
 Plan Name:    Hello-World-English
 Description:  Hello World in English
-Credentials:  [{u'planName': u'Hello-World-English', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io', u'key': u'uri'}]
+Credentials:  [{u'planName': u'Hello-World-English', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-eng...', u'key': u'uri'}]
 
 Credentials:
 Key  Value
-uri  http://hello-svc-eng-unbenefited-stealage.10.244.0.34.xip.io
+uri  http://hello-svc-eng...
 ```
 * Add the Italian hello world service to the repository by using ```storeplan.sh```
 ```
@@ -137,17 +137,17 @@ Service Name: ServiceRepository
 Plan Name: Hello-World-Italian
 Description: Hello World in Italian
 Value for uri:
-http://hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io
+http://hello-svc-ita...
 
 New version:
 Service Name: ServiceRepository
 Plan Name:    Hello-World-Italian
 Description:  Hello World in Italian
-Credentials:  [{u'planName': u'Hello-World-Italian', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io', u'key': u'uri'}]
+Credentials:  [{u'planName': u'Hello-World-Italian', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-ita...', u'key': u'uri'}]
 
 Credentials:
 Key  Value
-uri  http://hello-svc-ita-puffier-nonagreement.10.244.0.34.xip.io
+uri  http://hello-svc-ita...
 ```
 * Delete the dummy plan by using ```deleteplan.sh```
 ```
@@ -162,10 +162,10 @@ Hello-World-Italian  Hello World in Italian
 ```
 * Note that changing the underlying repository will not refresh the marketplace in Cloud Foundry. Run ```cf update-service-broker``` to trigger an update
 ```
-cf update-service-broker service-repository admin admin http://service-repository-stalkless-overbrutality.10.244.0.34.xip.io
+cf update-service-broker service-repository admin admin http://service-repository...
 Updating service broker service-repository as admin...
 OK
-Warning: Service plans are missing from the broker's catalog (http://service-repository-stalkless-overbrutality.10.244.0.34.xip.io/v2/catalog) but can not be removed from Cloud Foundry while instances exist. The plans have been deactivated to prevent users from attempting to provision new instances of these plans. The broker should continue to support bind, unbind, and delete for existing instances; if these operations fail contact your broker provider.
+Warning: Service plans are missing from the broker's catalog (http://service-repository...) but can not be removed from Cloud Foundry while instances exist. The plans have been deactivated to prevent users from attempting to provision new instances of these plans. The broker should continue to support bind, unbind, and delete for existing instances; if these operations fail contact your broker provider.
 ServiceRepository
   DummyPlan
 ```
