@@ -1,6 +1,8 @@
 #Cloud Foundry Service Repository Demo
 Small demo that demonstrates how to build and deploy your own service broker on Cloud Foundry. The demo implements a simple service repository where you can add your own services, which can then be linked into any application deployed on Cloud Foundry.
 
+This demo is not production quality and see [issues-todo](ISSUES-TODO.md) for known issues and potential improvements that can be made to this demo.
+
 ##Deployment Instructions
 ###Download Source Code from Repository
 ```
