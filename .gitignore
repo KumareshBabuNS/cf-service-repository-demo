@@ -4,6 +4,8 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
+/localonly/
+
 # Package Files #
 *.jar
 *.war
@@ -19,3 +21,6 @@ hs_err_pid*
 .classpath
 .project
 /.settings/
+
+/.idea/
+*.iml
