@@ -96,6 +96,7 @@ The following apps should now be running:
 * hello-svc-english - Hello World service, exposing a REST service doing Hello World in English, which is called by hello-client
 * hello-svc-italian - Hello World service, exposing a REST service doing Hello World in Italian, which is called by hello-client
 * service-repository - The service repository installed earlier in this document
+
 ##Register hello world services in service repository
 These instructions leverages a set of scripts in the admintool directory. The endpoint information is configured in setenv.sh. The file may look as follows:
 ```
@@ -113,20 +114,27 @@ ServiceRepository  Service Repository  True
 Name       Description
 DummyPlan  Dummy Plan
 ```
+* Create a new repository for the Hello World services by using ```storeservice.sh```
+```
+./storeservice.sh "HelloWorld" "Hello World services" true
+Name:        HelloWorld
+Description: Hello World services
+Is Bindable: True
+```
 * Add the English hello world service to the repository by using ```storeplan.sh```
 ```
-./storeplan.sh ServiceRepository Hello-World-English "Hello World in English" uri
-Service Name: ServiceRepository
+./storeplan.sh HelloWorld Hello-World-English "Hello World in English" uri
+Service Name: HelloWorld
 Plan Name: Hello-World-English
 Description: Hello World in English
 Value for uri:
 http://hello-svc-eng...
 
 New version:
-Service Name: ServiceRepository
+Service Name: HelloWorld
 Plan Name:    Hello-World-English
 Description:  Hello World in English
-Credentials:  [{u'planName': u'Hello-World-English', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-eng...', u'key': u'uri'}]
+Credentials:  [{u'planName': u'Hello-World-English', u'serviceName': u'HelloWorld', u'value': u'http://hello-svc-eng...', u'key': u'uri'}]
 
 Credentials:
 Key  Value
@@ -134,18 +142,18 @@ uri  http://hello-svc-eng...
 ```
 * Add the Italian hello world service to the repository by using ```storeplan.sh```
 ```
-./storeplan.sh ServiceRepository Hello-World-Italian "Hello World in Italian" uri
-Service Name: ServiceRepository
+./storeplan.sh HelloWorld Hello-World-Italian "Hello World in Italian" uri
+Service Name: HelloWorld
 Plan Name: Hello-World-Italian
 Description: Hello World in Italian
 Value for uri:
 http://hello-svc-ita...
 
 New version:
-Service Name: ServiceRepository
+Service Name: HelloWorld
 Plan Name:    Hello-World-Italian
 Description:  Hello World in Italian
-Credentials:  [{u'planName': u'Hello-World-Italian', u'serviceName': u'ServiceRepository', u'value': u'http://hello-svc-ita...', u'key': u'uri'}]
+Credentials:  [{u'planName': u'Hello-World-Italian', u'serviceName': u'HelloWorld', u'value': u'http://hello-svc-ita...', u'key': u'uri'}]
 
 Credentials:
 Key  Value
@@ -155,12 +163,17 @@ uri  http://hello-svc-ita...
 ```
 ./deleteplan.sh ServiceRepository DummyPlan
 ```
-* Run ```listplans.sh``` to see the changes made to the repository
+* Run ```listplans.sh``` to see the new services in the repository
 ```
-./listplans.sh ServiceRepository
+./listplans.sh HelloWorld
 Name                 Description
 Hello-World-English  Hello World in English
 Hello-World-Italian  Hello World in Italian
+```
+* Remove other dummy data that is no longer needed
+```
+./deleteplan.sh ServiceRepository DummyPlan
+./deleteservice.sh ServiceRepository
 ```
 * Note that changing the underlying repository will not refresh the marketplace in Cloud Foundry. Run ```cf update-service-broker``` to trigger an update
 ```
@@ -174,7 +187,7 @@ ServiceRepository
 The error can be ignored as the DummyPlan has not been used for anything in this case.
 * Enable access to the newly registered plan to everybody
 ```
-cf enable-service-access ServiceRepository
+cf enable-service-access HelloWorld
 ```
 * Run ```cf marketplace``` to verify that the service and plan shows up on the marketplace.
 ```
@@ -182,17 +195,17 @@ cf marketplace
 Getting services from marketplace in org me / space development as admin...
 OK
 
-service             plans                                      description
-ServiceRepository   Hello-World-English, Hello-World-Italian   Service Repository
+service      plans                                      description
+HelloWorld   Hello-World-English, Hello-World-Italian   Hello World services
 ```
 ###Reconfigure the Hello World client to leverage the service repository instead of the user provided service
 * Create a service instance for the English hello world service
 ```
-cf create-service ServiceRepository Hello-World-English hello-service-english
+cf create-service HelloWorld Hello-World-English hello-service-english
 ```
 * Create a service instance for the Italian hello world service
 ```
-cf create-service ServiceRepository Hello-World-Italian hello-service-italian
+cf create-service HelloWorld Hello-World-Italian hello-service-italian
 ```
 * Running ```cf services``` will display the two service instances just created, as well as some user provided services created earlier.
 ```
