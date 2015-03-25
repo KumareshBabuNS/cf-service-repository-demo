@@ -53,12 +53,16 @@ public class ServiceController {
     	List<Map<String, Object>> jsonServices = new ArrayList<>();
     	for(Service s:services) {
     		List<Plan> plans = planRepository.findByServiceName(s.getName(), new Sort("name"));
-    		List<Map<String, String>> jsonPlans = new ArrayList<Map<String, String>>();
+    		List<Map<String, Object>> jsonPlans = new ArrayList<Map<String, Object>>();
     		for(Plan p:plans) {
-    			Map<String, String> jsonAttributes = new HashMap<>();
+    			Map<String, Object> jsonAttributes = new HashMap<>();
     			jsonAttributes.put("id", p.getId());
     			jsonAttributes.put("name", p.getName());
     			jsonAttributes.put("description", p.getDescription());
+
+        		Map<String, String> metadata = new HashMap<>();
+        		jsonAttributes.put("metadata", metadata);
+    			
     			jsonPlans.add(jsonAttributes);
     		}
     		Map<String, Object> jsonAttributes = new HashMap<>();
@@ -67,6 +71,10 @@ public class ServiceController {
     		jsonAttributes.put("description", s.getDescription());
     		jsonAttributes.put("bindable", s.isBindable());
     		jsonAttributes.put("plans", jsonPlans);
+
+    		Map<String, String> metadata = new HashMap<>();
+    		jsonAttributes.put("metadata", metadata);
+    		
     		jsonServices.add(jsonAttributes);
     	}
     	
