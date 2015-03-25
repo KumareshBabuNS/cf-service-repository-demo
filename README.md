@@ -31,6 +31,7 @@ name                 requested state   instances   memory   disk   urls
 service-repository   started           1/1         512M     1G     service-repository...
 ```
 ###Register and enable the service repository as a service broker within Cloud Foundry
+It's required for the next steps to be connected to Cloud Foundry with an admin user. Look for the Admin credentials, found in the UAA section in Ops Manager.
 * Create service broker
 ```
 cf create-service-broker service-repository admin admin http://service-repository...
